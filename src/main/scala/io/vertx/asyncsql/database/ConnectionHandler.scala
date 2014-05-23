@@ -52,10 +52,19 @@ trait ConnectionHandler extends ScalaBusMod {
 
   protected def selectCommand(json: JsonObject): String = {
     val table = escapeField(json.getString("table"))
-    Option(json.getArray("fields")) match {
+    var offset = json.getInteger("offset")
+    var limit = json.getInteger("limit")
+    var stmt = Option(json.getArray("fields")) match {
       case Some(fields) => fields.asScala.toStream.map(elem => escapeField(elem.toString)).mkString("SELECT ", ",", " FROM " + table)
       case None => "SELECT * FROM " + table
     }
+    if(limit != null) {
+      stmt += " LIMIT " + limit
+    }
+    if(offset != null) {
+      stmt += " OFFSET " + offset
+    }
+    stmt
   }
 
   protected def select(json: JsonObject): AsyncReply = AsyncReply(pool.withConnection({ c: Connection =>
@@ -109,7 +118,7 @@ trait ConnectionHandler extends ScalaBusMod {
     }
   }))
 
-  
+
   protected def sendWithPool(fn: Connection => Future[QueryResult]): Future[SyncReply] = pool.withConnection({ c: Connection =>
     fn(c) map buildResults recover {
       case x: GenericDatabaseException =>
