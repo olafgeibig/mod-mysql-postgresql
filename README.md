@@ -55,7 +55,7 @@ The module will reply to all requests. In the message, there will be either a `"
         ["Mr. Test", "mr-test@example.com", true, 32, 123.45, "2014-04-04"],
         ["Mrs. Test", "mrs-test@example.com", false, 16, 543.21, "2022-02-22"]
       ]
-    } 
+    }
 
 * `rows` gives you the number of rows affected by the statement sent to the server. Bear in mind that MySQL only shows a row count on changed rows (DELETE, UPDATE, INSERT statements) whereas PostgreSQL also shows the number of SELECTed rows here.
 * `message` is a status message from the server.
@@ -86,11 +86,14 @@ Use this action to insert new rows into a table. You need to specify a table, th
 ### select
 
 The `select` action creates a `SELECT` statement to get a projection from a table. You can filter the columns by providing a `fields` array. If you omit the `fields` array, it selects every column available in the table.
+A simple paging can be done with the optional parameters limit and offset.
 
     {
       "action" : "select",
       "table" : "some_test",
       "fields" : ["name", "email", "is_male", "age", "money", "wedding_date"], // Optional
+      "limit" : 10, // Optional
+      "offset" : 100 // Optional
     }
 
 ### prepared
@@ -129,7 +132,7 @@ Takes several statements and wraps them into a single transaction for the server
 
 ### raw - Raw commands
 
-Use this action to send arbitrary commands to the database. You should be able to do submit any query or insertion with this command. 
+Use this action to send arbitrary commands to the database. You should be able to do submit any query or insertion with this command.
 
 Here is an example for creating a table in PostgreSQL:
 
@@ -157,7 +160,7 @@ And if you want to drop it again, you can send the following:
 
 You can always use `raw` to do anything on the database. If the statement is a query, it will return its results just like a `select`.
 
-The `select` and `insert` commands are just for you to be able to have a cross-database application in the end. If you do not use `raw`, these commands should create the needed statements for you. 
+The `select` and `insert` commands are just for you to be able to have a cross-database application in the end. If you do not use `raw`, these commands should create the needed statements for you.
 
 * `update` - Updates rows of a table
 * `delete` - Deletes rows from a table
@@ -202,7 +205,7 @@ These actions are currently not available, but they should be implemented in the
     //   email VARCHAR(255),
     //   age INTEGER
     // );
-    { 
+    {
       "action" : "create",
       "table" : "some_test",
       "fields" : ["id PRIMARY KEY", "name VARCHAR(255)", "email VARCHAR(255)", "age INTEGER"]
